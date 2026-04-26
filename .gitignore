@@ -1,0 +1,29 @@
+# --- Flutter/Dart Specific ---
+# Build artifacts
+build/
+
+# Tooling and dependencies
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+
+# Web related
+build/web/
+
+# Symbol files
+*.pdb
+*.orig
+*.rej
+
+# --- Mobile Specific ---
+# Android
+.gradle/
+local.properties
+*.keystore
+*.jks
+
+# iOS
+.generated/
+Pods/
+*.xcworkspace
