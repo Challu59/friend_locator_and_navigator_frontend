@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget{
   const LoginScreen({super.key});
@@ -29,12 +30,31 @@ class _LoginScreenState extends State<LoginScreen>{
        isLoading = false;
      });
 
-     if(result!=null){
-       print("Access token: ${result['access']}");
+     if(result != null){
+       ScaffoldMessenger.of(context).showSnackBar(
+         const SnackBar(content:
+         Text("Login successful",
+           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+           backgroundColor: Colors.green,
+         )
+       );
      }
      else{
-       print("Login failed");
+       ScaffoldMessenger.of(context).showSnackBar(
+         const SnackBar(content:
+         Text("Login failed",
+           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+           backgroundColor: Colors.red,
+         )
+       );
      }
+
+     // if(result!=null){
+     //   print("Access token: ${result['access']}");
+     // }
+     // else{
+     //   print("Login failed");
+     // }
   }
 
   @override
@@ -60,6 +80,20 @@ class _LoginScreenState extends State<LoginScreen>{
                 onPressed: login,
                 child: const Text("Login")
             ),
+            
+            SizedBox(height: 5,),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const RegisterScreen(),
+                  ),
+                );
+              },
+              child: const Text("Don't have an account? Register"),
+            ),
+
           ],
         ),
       ),

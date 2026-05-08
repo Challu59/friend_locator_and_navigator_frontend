@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/auth/screens/login_screen.dart';
 import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget{
@@ -29,8 +30,31 @@ class _RegisterScreenState extends State<RegisterScreen>{
     );
     setState(() {
       isLoading = false;
-    });
+    }
+    );
 
+    if(result){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+             Text("Registration successful, please log in.",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+          backgroundColor: Colors.green,
+
+        )
+      );
+      Navigator.pop(context);
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content:
+          Text("Registration failed!!!",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+            backgroundColor: Colors.red,
+          )
+      );
+    }
+    
   }
 
   @override
@@ -64,7 +88,21 @@ class _RegisterScreenState extends State<RegisterScreen>{
             isLoading? CircularProgressIndicator():
             ElevatedButton(
                 onPressed: register,
-                child: Text("Register"))
+                child: Text("Register")),
+
+            SizedBox(height: 5,),
+
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginScreen(),
+                  ),
+                );
+              },
+              child: const Text("Already have an account? Login"),
+            ),
           ],
         ),
       ),
