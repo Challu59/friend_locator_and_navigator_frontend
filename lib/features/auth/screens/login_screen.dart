@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'register_screen.dart';
+import '../../home/screens/home_screen.dart';
+import '../../../core/storage/token_storage.dart';
 
 class LoginScreen extends StatefulWidget{
   const LoginScreen({super.key});
@@ -30,7 +32,18 @@ class _LoginScreenState extends State<LoginScreen>{
        isLoading = false;
      });
 
+     //login successful
      if(result != null){
+       await TokenStorage.saveTokens(
+           accessToken: result['access'],
+           refreshToken: result['refresh']
+       );
+       
+       Navigator.pushReplacement(
+         context, 
+        MaterialPageRoute(builder: (_) => const HomeScreen(),)
+       );
+
        ScaffoldMessenger.of(context).showSnackBar(
          const SnackBar(content:
          Text("Login successful",
@@ -39,10 +52,11 @@ class _LoginScreenState extends State<LoginScreen>{
          )
        );
      }
+
      else{
        ScaffoldMessenger.of(context).showSnackBar(
          const SnackBar(content:
-         Text("Login failed",
+         Text("Invalid credentials.",
            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
            backgroundColor: Colors.red,
          )

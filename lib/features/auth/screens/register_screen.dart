@@ -23,7 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen>{
       isLoading = true;
     });
 
-    final result = await authService.register(
+    final success = await authService.register(
         emailController.text,
         usernameController.text,
         passwordController.text
@@ -33,7 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen>{
     }
     );
 
-    if(result){
+    if(success){
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content:
