@@ -1,5 +1,7 @@
+import 'package:frontend/core/storage/token_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../models/user_models.dart';
 
 class AuthService {
   final String baseUrl = "http://10.0.2.2:8000/api/auth";
@@ -37,4 +39,26 @@ Future<Map<String, dynamic>?> login(String email, String password) async{
       return null;
     }
 }
+
+//fetch users
+Future<List<UserModel>> fetchUsers() async{
+    final token = await TokenStorage.getAccessToken();
+
+    final response = await http.get(
+      Uri.parse("${baseUrl}/users/"),
+      headers: {
+        "Content-Type": "appliation/json",
+        "Authorization": "Bearer ${token}"
+      },
+    );
+
+    if(response.statusCode == 200){
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((user)=> UserModel.fromJson(user)).toList();
+    }
+    else{
+      throw Exception("Failed to fetch users");
+    }
+}
+
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/features/auth/screens/login_screen.dart';
 import '../../../core/storage/token_storage.dart';
+import '../../auth/models/user_models.dart';
+import '../../auth/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
@@ -21,6 +23,8 @@ class _HomeScreenState extends State<HomeScreen>{
     );
   }
 
+  final AuthService authService = AuthService();
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -34,9 +38,44 @@ class _HomeScreenState extends State<HomeScreen>{
       ),
         ],
       ),
-      body: Center(
-        child: Text("Welcome"),
-      ),
+      body: FutureBuilder<List<UserModel>>(
+        future:  authService.fetchUsers(),
+        builder: (context, snapshot){
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if(snapshot.hasError) {
+            return Center(
+              child: Text("Error: ${snapshot.error}"),
+            );
+          }
+            final users = snapshot.data?? [];
+
+            if(users.isEmpty){
+              return const Center(
+                child: Text("No users found"),
+              );
+            }
+
+            return ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (context, index){
+                  final user = users[index];
+
+                  return ListTile(
+                    leading: const CircleAvatar(
+                      child: Icon(Icons.person),
+                    ),
+                    title: Text(user.username),
+                    subtitle: Text(user.email)
+                  );
+                }
+            );
+          }
+    )
     );
   }
 
