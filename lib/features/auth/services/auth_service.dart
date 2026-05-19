@@ -9,7 +9,7 @@ class AuthService {
   //register
   Future<bool> register(String email, String username, String password) async{
     final response = await http.post(
-      Uri.parse("${baseUrl}/register/"),
+      Uri.parse("$baseUrl/register/"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "email": email,
@@ -23,7 +23,7 @@ class AuthService {
 //login
 Future<Map<String, dynamic>?> login(String email, String password) async{
     final response = await http.post(
-      Uri.parse("${baseUrl}/login/"),
+      Uri.parse("$baseUrl/login/"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(
         {
@@ -48,7 +48,7 @@ Future<List<UserModel>> fetchUsers() async{
       Uri.parse("${baseUrl}/users/"),
       headers: {
         "Content-Type": "appliation/json",
-        "Authorization": "Bearer ${token}"
+        "Authorization": "Bearer $token"
       },
     );
 

@@ -3,6 +3,8 @@ import 'package:frontend/features/auth/screens/login_screen.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_models.dart';
 import '../../auth/services/auth_service.dart';
+import '../../chat/services/chat_service.dart';
+import '../../chat/screens/chat_screen.dart';
 
 class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
@@ -70,7 +72,18 @@ class _HomeScreenState extends State<HomeScreen>{
                       child: Icon(Icons.person),
                     ),
                     title: Text(user.username),
-                    subtitle: Text(user.email)
+                    subtitle: Text(user.email),
+                    onTap: () async{
+                      final chatService =  ChatService();
+                      final room = await chatService.createOrGetRoom(user.id);
+                      Navigator.push(context,
+                          MaterialPageRoute(
+                              builder: (_) => ChatScreen(
+                                  roomId: room.id, otherUser: user
+                              )
+                          )
+                      );
+                  },
                   );
                 }
             );
