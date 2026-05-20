@@ -54,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen>{
               child: Text("Error: ${snapshot.error}"),
             );
           }
+
             final users = snapshot.data?? [];
 
             if(users.isEmpty){
@@ -74,15 +75,21 @@ class _HomeScreenState extends State<HomeScreen>{
                     title: Text(user.username),
                     subtitle: Text(user.email),
                     onTap: () async{
-                      final chatService =  ChatService();
+                      final chatService = ChatService();
+                      try{
+
                       final room = await chatService.createOrGetRoom(user.id);
                       Navigator.push(context,
                           MaterialPageRoute(
                               builder: (_) => ChatScreen(
-                                  roomId: room.id, otherUser: user
-                              )
-                          )
+                                  roomId: room.id, otherUser: user,
+                              ),
+                          ),
                       );
+                      }
+                      catch(e){
+                        print("Error navigating to chat screen: $e");
+                      }
                   },
                   );
                 }

@@ -26,10 +26,11 @@ class ChatService {
     );
 
     if(response.statusCode == 200 || response.statusCode == 201){
-      return(ChatRoomModel.fromJson(
+      print("Response body: ${response.body}");
+      return ChatRoomModel.fromJson(
         jsonDecode(response.body),
-      )
       );
+
     }
 
     throw Exception("Failed to create or get room");
