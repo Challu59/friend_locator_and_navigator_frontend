@@ -24,7 +24,8 @@ class MessageModel{
         sender: json['sender'],
         senderUsername: json['sender_username'],
         content: json['content'],
-        timestamp: json['timestamp']);
+        timestamp: DateTime.parse(json['timestamp'])
+    );
   }
 
 
