@@ -5,6 +5,7 @@ import '../../auth/models/user_models.dart';
 import '../../auth/services/auth_service.dart';
 import '../../chat/services/chat_service.dart';
 import '../../chat/screens/chat_screen.dart';
+import'../../../core/storage/session_storage.dart';
 
 class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
@@ -17,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen>{
 
   Future<void> logout(BuildContext context) async{
     await TokenStorage.clearTokens();
+    await SessionStorage.clearUser();
     Navigator.pushAndRemoveUntil(context,
         MaterialPageRoute(
           builder: (_) => LoginScreen(),

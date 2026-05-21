@@ -3,6 +3,7 @@ import '../services/auth_service.dart';
 import 'register_screen.dart';
 import '../../home/screens/home_screen.dart';
 import '../../../core/storage/token_storage.dart';
+import '../../../core/storage/session_storage.dart';
 
 class LoginScreen extends StatefulWidget{
   const LoginScreen({super.key});
@@ -38,6 +39,14 @@ class _LoginScreenState extends State<LoginScreen>{
            accessToken: result['access'],
            refreshToken: result['refresh']
        );
+
+       final user = result['user'];
+
+       await SessionStorage.saveUser(
+           userId: user['id'],
+           username: user['username'],
+           email: user['email']
+       );
        
        Navigator.pushReplacement(
          context, 
@@ -63,12 +72,7 @@ class _LoginScreenState extends State<LoginScreen>{
        );
      }
 
-     // if(result!=null){
-     //   print("Access token: ${result['access']}");
-     // }
-     // else{
-     //   print("Login failed");
-     // }
+
   }
 
   @override
