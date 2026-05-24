@@ -60,50 +60,93 @@ class _RegisterScreenState extends State<RegisterScreen>{
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      body: Padding
-        (padding: EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: "Enter your email"
-              ),
-            ),
-            TextField(
-              controller: usernameController,
-              decoration: const InputDecoration(
-                labelText: "Enter your username"
-              ),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: "Enter your password"
-              ),
-            ),
-            SizedBox(height: 20,),
+      body: SafeArea(
+        child:SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 60,),
 
-            isLoading? CircularProgressIndicator():
-            ElevatedButton(
-                onPressed: register,
-                child: Text("Register")),
-
-            SizedBox(height: 5,),
-
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LoginScreen(),
+                const Text(
+                  "Create Account",
+                  style: TextStyle(
+                    fontSize: 32, fontWeight: FontWeight.bold
                   ),
-                );
-              },
-              child: const Text("Already have an account? Login"),
-            ),
-          ],
+                ),
+                const Text(
+                  "Join your friends now",
+                  style: TextStyle(
+                    fontSize: 16, color: Colors.grey
+                  ),
+                ),
+                SizedBox(height: 30,),
+
+                Text("Email",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: 8,),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                      hintText: "navchat@gmail.com",
+                    prefixIcon: Icon(Icons.email_outlined)
+                  ),
+                ),
+
+                SizedBox(height: 10,),
+
+                Text("Username",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: 8,),
+                TextField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(
+                      hintText: "YourName123",
+                    prefixIcon: Icon(Icons.alternate_email)
+                  ),
+                ),
+
+                SizedBox(height: 20,),
+
+                Text("Password",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                SizedBox(height: 8,),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                      hintText: "********",
+                    prefixIcon: Icon(Icons.lock_outline)
+                  ),
+                ),
+
+                SizedBox(height: 20,),
+
+                isLoading? Center(child: CircularProgressIndicator(),):
+                ElevatedButton(
+                    onPressed: register,
+                    child: Text("Register", style: TextStyle(fontSize: 18),)),
+
+                SizedBox(height: 5,),
+
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LoginScreen(),
+                      ),
+                    );
+                  },
+                  child: Center(child: const Text("Already have an account? Login"),),
+                ),
+              ],
+        )
+
+
         ),
       ),
     );
