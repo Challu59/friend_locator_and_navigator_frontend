@@ -93,7 +93,6 @@ class _RegisterScreenState extends State<RegisterScreen>{
                     prefixIcon: Icon(Icons.email_outlined)
                   ),
                 ),
-
                 SizedBox(height: 10,),
 
                 Text("Username",

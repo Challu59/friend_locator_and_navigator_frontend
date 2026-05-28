@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:frontend/features/chat/services/chat_service.dart';
 import '../../auth/models/user_models.dart';
 import '../../chat/models/message_model.dart';
 import '../../../core/storage/session_storage.dart';
+import '../services/socket_service.dart';
 
 class ChatScreen extends StatefulWidget{
  final int roomId;
@@ -21,6 +23,7 @@ class ChatScreen extends StatefulWidget{
 
 class _ChatScreenState extends State<ChatScreen>{
     final ChatService chatService = ChatService();
+    final SocketService socketService = SocketService();
     final TextEditingController messageController = TextEditingController();
     final ScrollController scrollController = ScrollController();
 
@@ -36,8 +39,25 @@ class _ChatScreenState extends State<ChatScreen>{
       initializeChat();
     }
 
-    Future<void> initializeChat() async{
-      currentUserId = await SessionStorage.getUserId();
+    Future<void> initializeChat() async {
+      currentUserId =
+      await SessionStorage.getUserId();
+
+      socketService.connect(widget.roomId);
+
+      socketService.stream.listen((data) {
+        final decoded = jsonDecode(data);
+
+        final message =
+        MessageModel.fromJson(decoded);
+
+        setState(() {
+          messages.add(message);
+        });
+
+        _scrollToBottom();
+      });
+
       await loadMessages();
     }
 
@@ -58,29 +78,49 @@ class _ChatScreenState extends State<ChatScreen>{
       }
     }
 
-    Future<void> sendMessage() async{
+    // using HTTP
+
+    // Future<void> sendMessage() async{
+    //   final content = messageController.text.trim();
+    //   if(content.isEmpty || isSending){
+    //     return;
+    //   }
+    //
+    //   setState(() {
+    //     isSending = true;
+    //   });
+    //
+    //   try{
+    //     final message = await chatService.sendMessage(widget.roomId, content);
+    //         setState(() {
+    //           messages.add(message);
+    //           messageController.clear();
+    //         });
+    //     _scrollToBottom();
+    //
+    //   }finally{
+    //     setState(() {
+    //       isSending = false;
+    //     });
+    //   }
+    // }
+
+    // using websockets
+
+    void sendMessage() {
       final content = messageController.text.trim();
-      if(content.isEmpty || isSending){
+
+      if (content.isEmpty ||
+          currentUserId == null) {
         return;
       }
 
-      setState(() {
-        isSending = true;
-      });
+      socketService.sendMessage(
+        message: content,
+        senderId: currentUserId!,
+      );
 
-      try{
-        final message = await chatService.sendMessage(widget.roomId, content);
-            setState(() {
-              messages.add(message);
-              messageController.clear();
-            });
-        _scrollToBottom();
-
-      }finally{
-        setState(() {
-          isSending = false;
-        });
-      }
+      messageController.clear();
     }
 
     void _scrollToBottom(){
@@ -122,6 +162,7 @@ class _ChatScreenState extends State<ChatScreen>{
     @override
 
   void dispose(){
+      socketService.disconnect();
       messageController.dispose();
       scrollController.dispose();
       super.dispose();
