@@ -16,7 +16,11 @@ class SocketService {
     required String message,
     required int senderId,
   }) {
-    channel?.sink.add(
+    if (channel == null) {
+      throw StateError('Socket is not connected.');
+    }
+
+    channel!.sink.add(
       jsonEncode({
         'message': message,
         'sender_id': senderId,
@@ -24,9 +28,15 @@ class SocketService {
     );
   }
 
-  Stream get stream => channel!.stream;
+  Stream<String> get stream {
+    if (channel == null) {
+      throw StateError('Socket is not connected.');
+    }
+    return channel!.stream.cast<String>();
+  }
 
   void disconnect() {
     channel?.sink.close();
+    channel = null;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:frontend/features/chat/services/chat_service.dart';
 import '../../auth/models/user_models.dart';
 import '../../chat/models/message_model.dart';
@@ -32,6 +33,7 @@ class _ChatScreenState extends State<ChatScreen>{
     bool isLoading = true;
     bool isSending = false;
     int? currentUserId;
+    StreamSubscription<String>? _socketSubscription;
 
     @override
     void initState(){
@@ -43,22 +45,39 @@ class _ChatScreenState extends State<ChatScreen>{
       currentUserId =
       await SessionStorage.getUserId();
 
+      await loadMessages();
+
       socketService.connect(widget.roomId);
 
-      socketService.stream.listen((data) {
-        final decoded = jsonDecode(data);
+      _socketSubscription = socketService.stream.listen(
+        (data) {
+          final decoded = jsonDecode(data);
+          final message = MessageModel.fromJson(decoded);
 
-        final message =
-        MessageModel.fromJson(decoded);
+          if (!mounted) {
+            return;
+          }
 
-        setState(() {
-          messages.add(message);
-        });
+          setState(() {
+            final alreadyExists = messages.any(
+              (existing) => existing.id == message.id,
+            );
+            if (!alreadyExists) {
+              messages.add(message);
+            }
+          });
 
-        _scrollToBottom();
-      });
-
-      await loadMessages();
+          _scrollToBottom();
+        },
+        onError: (_) {
+          if (!mounted) {
+            return;
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Connection error. Please reopen chat.')),
+          );
+        },
+      );
     }
 
     Future<void> loadMessages() async{
@@ -111,16 +130,34 @@ class _ChatScreenState extends State<ChatScreen>{
       final content = messageController.text.trim();
 
       if (content.isEmpty ||
-          currentUserId == null) {
+          currentUserId == null || isSending) {
         return;
       }
 
-      socketService.sendMessage(
-        message: content,
-        senderId: currentUserId!,
-      );
+      setState(() {
+        isSending = true;
+      });
 
-      messageController.clear();
+      try {
+        socketService.sendMessage(
+          message: content,
+          senderId: currentUserId!,
+        );
+        messageController.clear();
+      } catch (_) {
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not send message. Check connection.')),
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            isSending = false;
+          });
+        }
+      }
     }
 
     void _scrollToBottom(){
@@ -162,6 +199,7 @@ class _ChatScreenState extends State<ChatScreen>{
     @override
 
   void dispose(){
+      _socketSubscription?.cancel();
       socketService.disconnect();
       messageController.dispose();
       scrollController.dispose();
