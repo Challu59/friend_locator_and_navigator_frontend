@@ -19,8 +19,14 @@ class _LoginScreenState extends State<LoginScreen>{
   final AuthService authService = AuthService();
 
   bool isLoading = false;
+  bool obscurePassword = true;
 
   void login() async{
+    if(emailController.text.isEmpty || passwordController.text.isEmpty){
+      _showSnackBar("Please fill in all the fields", Colors.red);
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
@@ -53,35 +59,37 @@ class _LoginScreenState extends State<LoginScreen>{
         MaterialPageRoute(builder: (_) => const HomeScreen(),)
        );
 
-       ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content:
-         Text("Login successful",
-           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-           backgroundColor: Colors.green,
-         )
-       );
+       _showSnackBar("Welcome back!", Colors.green);
      }
 
      else{
-       ScaffoldMessenger.of(context).showSnackBar(
-         const SnackBar(content:
-         Text("Invalid credentials.",
-           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-           backgroundColor: Colors.red,
-         )
-       );
+       _showSnackBar("Invalid credentials.", Colors.red);
      }
 
 
   }
 
+  void _showSnackBar(String message, Color bgColor){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text(message, style: TextStyle(fontWeight: FontWeight.bold),),
+          backgroundColor: bgColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context){
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 60,),
@@ -125,6 +133,7 @@ class _LoginScreenState extends State<LoginScreen>{
               SizedBox(height: 8,),
               TextField(
                 controller: emailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   hintText: "navchat@gmail.com",
                   prefixIcon: Icon(Icons.email_outlined)
@@ -134,15 +143,20 @@ class _LoginScreenState extends State<LoginScreen>{
               SizedBox(height: 20,),
 
               Text("Password",
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
               ),
               SizedBox(height: 8,),
               TextField(
                 controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
+                obscureText: obscurePassword,
+                decoration:  InputDecoration(
                   hintText: "********",
-                  prefixIcon: Icon(Icons.lock_outline)
+                  prefixIcon: Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                      icon: Icon(obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                      onPressed: () => setState(() => obscurePassword = !obscurePassword,
+                      ),
+                ),
                 ),
               ),
               SizedBox(height: 20,),
@@ -150,12 +164,11 @@ class _LoginScreenState extends State<LoginScreen>{
               isLoading? const Center(child: CircularProgressIndicator(),):
               ElevatedButton(
                   onPressed: login,
-                  child: const Text("Login",
-                  style: TextStyle(fontSize: 18),
+                  child: const Text("Log In",
                   ),
               ),
 
-              SizedBox(height: 5,),
+              SizedBox(height: 16,),
 
               TextButton(
                 onPressed: () {
