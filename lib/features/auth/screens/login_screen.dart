@@ -47,9 +47,9 @@ class _LoginScreenState extends State<LoginScreen>{
            username: user['username'],
            email: user['email']
        );
-       
+
        Navigator.pushReplacement(
-         context, 
+         context,
         MaterialPageRoute(builder: (_) => const HomeScreen(),)
        );
 
@@ -177,3 +177,5 @@ class _LoginScreenState extends State<LoginScreen>{
     );
   }
 }
+
+
