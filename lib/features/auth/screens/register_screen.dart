@@ -17,6 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen>{
   final AuthService authService = new AuthService();
 
   bool isLoading = false;
+  bool obscurePassword = true;
 
   void register() async{
     setState(() {
@@ -34,32 +35,38 @@ class _RegisterScreenState extends State<RegisterScreen>{
     );
 
     if(success){
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-             Text("Registration successful, please log in.",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-          backgroundColor: Colors.green,
-
-        )
-      );
+      _showSnackBar("Registration successful, please log in.", Colors.green);
       Navigator.pop(context);
     }
+
     else{
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content:
-          Text("Registration failed!!!",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-            backgroundColor: Colors.red,
-          )
-      );
+      _showSnackBar("Registration failed. Please try again.", Colors.red);
     }
     
+  }
+
+  void _showSnackBar(String message, Color bgColor){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text(message, style: const TextStyle(fontWeight: FontWeight.bold),),
+        backgroundColor: bgColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      )
+    );
   }
 
   @override
   Widget build(BuildContext context){
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+            onPressed: ()=> Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded)),
+      ),
+      extendBodyBehindAppBar: true,
       body: SafeArea(
         child:SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24),
@@ -115,10 +122,16 @@ class _RegisterScreenState extends State<RegisterScreen>{
                 SizedBox(height: 8,),
                 TextField(
                   controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: obscurePassword,
+                  decoration:  InputDecoration(
                       hintText: "********",
-                    prefixIcon: Icon(Icons.lock_outline)
+                    prefixIcon: Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                        onPressed: ()=> setState(() {
+                          obscurePassword = !obscurePassword;
+                        }),
+                        icon: Icon(obscurePassword? Icons.visibility_off_outlined: Icons.visibility_outlined),
+                    )
                   ),
                 ),
 
