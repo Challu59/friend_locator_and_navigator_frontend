@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/features/auth/screens/login_screen.dart';
-import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_models.dart';
+
 import '../../auth/services/auth_service.dart';
 import '../../chat/services/chat_service.dart';
-import '../../chat/screens/chat_screen.dart';
+
 import'../../../core/storage/session_storage.dart';
+import '../../../core/storage/token_storage.dart';
+
+import 'package:frontend/features/auth/screens/login_screen.dart';
+import '../../chat/screens/chat_screen.dart';
+import '../../friends/screens/friends_screen.dart';
+import '../../friends/screens/requests_screen.dart';
+
 
 class HomeScreen extends StatefulWidget{
   const HomeScreen({super.key});
@@ -52,18 +58,54 @@ class _HomeScreenState extends State<HomeScreen>{
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              shape: BoxShape.circle
-            ),
-            child: IconButton(
-              onPressed: () => logout(context),
-              icon: Icon(Icons.logout),
-              tooltip: 'LogOut',
-            ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                      const RequestsScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.notifications,
+                ),
+              ),
+
+
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                      const FriendsScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.people,
+                ),
+              ),
+              
+              Container(
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    shape: BoxShape.circle
+                ),
+                child: IconButton(
+                  onPressed: () => logout(context),
+                  icon: Icon(Icons.logout),
+                  tooltip: 'LogOut',
+                ),
+              )
+            ],
           )
+
 
         ],
       ),

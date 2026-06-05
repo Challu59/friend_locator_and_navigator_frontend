@@ -26,7 +26,6 @@ class ChatService {
     );
 
     if(response.statusCode == 200 || response.statusCode == 201){
-      print("Response body: ${response.body}");
       return ChatRoomModel.fromJson(
         jsonDecode(response.body),
       );
