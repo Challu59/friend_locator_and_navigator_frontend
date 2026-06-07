@@ -18,6 +18,21 @@ class FriendService {
     };
   }
 
+  Future<void> sendFriendRequest(int receiverId) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/send/"),
+      headers: await _getHeaders(),
+      body: jsonEncode({
+        "receiver_id": receiverId,
+      }),
+    );
+
+    if (response.statusCode != 200 &&
+        response.statusCode != 201) {
+      throw Exception("Failed to send friend request");
+    }
+  }
+
   Future<List<UserModel>> fetchFriends() async {
     final response = await http.get(
       Uri.parse(baseUrl),

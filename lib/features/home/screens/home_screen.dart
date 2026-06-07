@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen>{
                   Icons.people,
                 ),
               ),
-              
+
               Container(
                 margin: const EdgeInsets.only(right: 12),
                 decoration: BoxDecoration(
