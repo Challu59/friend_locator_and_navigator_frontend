@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'features/auth/screens/login_screen.dart';
 import '../core/storage/token_storage.dart';
-import '../features/home/screens/home_screen.dart';
+import '../features/home/screens/main_shell_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Future<Widget> _getInitialScreen() async{
     final bool loggedIn = await TokenStorage.isLoggedIn();
     if(loggedIn){
-      return const HomeScreen();
+      return const MainShellScreen();
     }
     else{
       return const LoginScreen();

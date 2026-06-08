@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../../core/storage/token_storage.dart';
 import '../models/chat_room_model.dart';
 import '../models/message_model.dart';
+import '../models/conversation_model.dart';
 
 class ChatService {
   final String baseUrl = "http://10.0.2.2:8000/api/chat";
@@ -34,6 +35,22 @@ class ChatService {
 
     throw Exception("Failed to create or get room");
 
+  }
+
+  Future<List<ConversationModel>> fetchConversations() async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/conversations/"),
+      headers: await _getHeaders(),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data
+          .map((item) => ConversationModel.fromJson(item))
+          .toList();
+    }
+
+    throw Exception("Failed to fetch conversations");
   }
 
   // future to fetch messages from the backend

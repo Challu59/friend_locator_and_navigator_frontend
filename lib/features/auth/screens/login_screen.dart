@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import 'register_screen.dart';
-import '../../home/screens/home_screen.dart';
+import '../../home/screens/main_shell_screen.dart';
 import '../../../core/storage/token_storage.dart';
 import '../../../core/storage/session_storage.dart';
 
@@ -56,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen>{
 
        Navigator.pushReplacement(
          context,
-        MaterialPageRoute(builder: (_) => const HomeScreen(),)
+        MaterialPageRoute(builder: (_) => const MainShellScreen(),)
        );
 
        _showSnackBar("Welcome back!", Colors.green);

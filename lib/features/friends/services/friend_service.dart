@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../../core/storage/token_storage.dart';
 import '../../auth/models/user_models.dart';
 import '../models/friend_request_model.dart';
+import '../models/searchable_user_model.dart';
 
 class FriendService {
 
@@ -66,6 +67,23 @@ class FriendService {
     }
 
     throw Exception("Failed to fetch pending requests");
+  }
+
+  Future<List<SearchableUserModel>> searchUsers(String query) async {
+    final encodedQuery = Uri.encodeQueryComponent(query);
+    final response = await http.get(
+      Uri.parse("$baseUrl/search/?q=$encodedQuery"),
+      headers: await _getHeaders(),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data
+          .map((user) => SearchableUserModel.fromJson(user))
+          .toList();
+    }
+
+    throw Exception("Failed to search users");
   }
 
   Future<void> acceptRequest(int requestId) async {
