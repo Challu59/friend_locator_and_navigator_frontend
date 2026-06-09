@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../friends/screens/requests_screen.dart';
 import '../../friends/screens/search_screen.dart';
 import '../../friends/services/friend_service.dart';
@@ -23,6 +22,16 @@ class _MainShellScreenState extends State<MainShellScreen> {
 
   final FriendService _friendService = FriendService();
 
+  late final List<Widget> _screens = [
+    ChatsScreen(key: _chatsKey),
+    RequestsScreen(
+      key: _requestsKey,
+      onRequestsChanged: _loadPendingCount,
+    ),
+    SearchScreen(key: _searchKey),
+    const ProfileScreen(),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +47,8 @@ class _MainShellScreenState extends State<MainShellScreen> {
   }
 
   void _onTabSelected(int index) {
+    if (_currentIndex == index) return;
+
     setState(() => _currentIndex = index);
 
     if (index == 0) {
@@ -52,57 +63,59 @@ class _MainShellScreenState extends State<MainShellScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final screens = [
-      ChatsScreen(key: _chatsKey),
-      RequestsScreen(
-        key: _requestsKey,
-        onRequestsChanged: _loadPendingCount,
-      ),
-      SearchScreen(key: _searchKey),
-      const ProfileScreen(),
-    ];
-
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: screens,
+        children: _screens,
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: _onTabSelected,
-        destinations: [
-          const NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline),
-            selectedIcon: Icon(Icons.chat_bubble),
-            label: 'Chats',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Colors.grey.shade200, width: 1),
           ),
-          NavigationDestination(
-            icon: _pendingRequestCount > 0
-                ? Badge(
-                    label: Text('$_pendingRequestCount'),
-                    child: const Icon(Icons.notifications_outlined),
-                  )
-                : const Icon(Icons.notifications_outlined),
-            selectedIcon: _pendingRequestCount > 0
-                ? Badge(
-                    label: Text('$_pendingRequestCount'),
-                    child: const Icon(Icons.notifications),
-                  )
-                : const Icon(Icons.notifications),
-            label: 'Requests',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.search),
-            selectedIcon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        indicatorColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+        ),
+        child: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: _onTabSelected,
+          elevation: 0,
+          backgroundColor: Colors.white,
+          height: 65,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          animationDuration: const Duration(milliseconds: 400),
+          indicatorColor: theme.colorScheme.primary.withOpacity(0.12),
+          destinations: [
+            const NavigationDestination(
+              icon: Icon(Icons.chat_bubble_outline, size: 22),
+              selectedIcon: Icon(Icons.chat_bubble, size: 22),
+              label: 'Chats',
+            ),
+            NavigationDestination(
+              icon: _pendingRequestCount > 0
+                  ? Badge(
+                label: Text('$_pendingRequestCount'),
+                child: const Icon(Icons.notifications_outlined, size: 24),
+              )
+                  : const Icon(Icons.notifications_outlined, size: 24),
+              selectedIcon: _pendingRequestCount > 0
+                  ? Badge(
+                label: Text('$_pendingRequestCount'),
+                child: const Icon(Icons.notifications, size: 24),
+              )
+                  : const Icon(Icons.notifications, size: 24),
+              label: 'Requests',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.search, size: 24),
+              selectedIcon: Icon(Icons.search, size: 24),
+              label: 'Search',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.person_outline, size: 24),
+              selectedIcon: Icon(Icons.person, size: 24),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }
