@@ -15,6 +15,7 @@ class MainShellScreen extends StatefulWidget {
 class _MainShellScreenState extends State<MainShellScreen> {
   int _currentIndex = 0;
   int _pendingRequestCount = 0;
+  int _unreadMessageCount = 0;
 
   final GlobalKey<ChatsScreenState> _chatsKey = GlobalKey();
   final GlobalKey<SearchScreenState> _searchKey = GlobalKey();
@@ -23,7 +24,13 @@ class _MainShellScreenState extends State<MainShellScreen> {
   final FriendService _friendService = FriendService();
 
   late final List<Widget> _screens = [
-    ChatsScreen(key: _chatsKey),
+    ChatsScreen(
+      key: _chatsKey,
+      onUnreadCountChanged: (count) {
+        if (!mounted) return;
+        setState(() => _unreadMessageCount = count);
+      },
+    ),
     RequestsScreen(
       key: _requestsKey,
       onRequestsChanged: _loadPendingCount,
@@ -84,9 +91,27 @@ class _MainShellScreenState extends State<MainShellScreen> {
           animationDuration: const Duration(milliseconds: 400),
           indicatorColor: theme.colorScheme.primary.withOpacity(0.12),
           destinations: [
-            const NavigationDestination(
-              icon: Icon(Icons.chat_bubble_outline, size: 22),
-              selectedIcon: Icon(Icons.chat_bubble, size: 22),
+            NavigationDestination(
+              icon: _unreadMessageCount > 0
+                  ? Badge(
+                      label: Text(
+                        _unreadMessageCount > 99
+                            ? '99+'
+                            : '$_unreadMessageCount',
+                      ),
+                      child: const Icon(Icons.chat_bubble_outline, size: 22),
+                    )
+                  : const Icon(Icons.chat_bubble_outline, size: 22),
+              selectedIcon: _unreadMessageCount > 0
+                  ? Badge(
+                      label: Text(
+                        _unreadMessageCount > 99
+                            ? '99+'
+                            : '$_unreadMessageCount',
+                      ),
+                      child: const Icon(Icons.chat_bubble, size: 22),
+                    )
+                  : const Icon(Icons.chat_bubble, size: 22),
               label: 'Chats',
             ),
             NavigationDestination(

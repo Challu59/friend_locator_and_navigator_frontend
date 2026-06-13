@@ -4,12 +4,16 @@ class ConversationModel {
   final int roomId;
   final UserModel otherUser;
   final LastMessagePreview? lastMessage;
+  final int unreadCount;
 
   ConversationModel({
     required this.roomId,
     required this.otherUser,
     this.lastMessage,
+    this.unreadCount = 0,
   });
+
+  bool get hasUnread => unreadCount > 0;
 
   factory ConversationModel.fromJson(Map<String, dynamic> json) {
     return ConversationModel(
@@ -18,6 +22,7 @@ class ConversationModel {
       lastMessage: json['last_message'] != null
           ? LastMessagePreview.fromJson(json['last_message'])
           : null,
+      unreadCount: json['unread_count'] ?? 0,
     );
   }
 }

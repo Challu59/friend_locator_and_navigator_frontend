@@ -5,7 +5,9 @@ import '../../chat/services/chat_service.dart';
 import '../../chat/screens/chat_screen.dart';
 
 class ChatsScreen extends StatefulWidget {
-  const ChatsScreen({super.key});
+  final ValueChanged<int>? onUnreadCountChanged;
+
+  const ChatsScreen({super.key, this.onUnreadCountChanged});
 
   @override
   State<ChatsScreen> createState() => ChatsScreenState();
@@ -23,7 +25,14 @@ class ChatsScreenState extends State<ChatsScreen> {
 
   void _loadConversations() {
     setState(() {
-      _conversationsFuture = _chatService.fetchConversations();
+      _conversationsFuture = _chatService.fetchConversations().then((conversations) {
+        final totalUnread = conversations.fold<int>(
+          0,
+          (sum, conversation) => sum + conversation.unreadCount,
+        );
+        widget.onUnreadCountChanged?.call(totalUnread);
+        return conversations;
+      });
     });
   }
 
@@ -145,31 +154,62 @@ class ChatsScreenState extends State<ChatsScreen> {
               itemBuilder: (context, index) {
                 final conversation = conversations[index];
                 final lastMessage = conversation.lastMessage;
+                final hasUnread = conversation.hasUnread;
                 final preview = lastMessage?.content ?? 'No messages yet';
                 final timeLabel = lastMessage != null
                     ? _formatTimestamp(lastMessage.timestamp)
                     : '';
 
-                return ListTile(
+                return Material(
+                  color: hasUnread
+                      ? theme.colorScheme.primary.withValues(alpha: 0.06)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
+                  child: ListTile(
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  leading: CircleAvatar(
-                    radius: 26,
-                    backgroundColor: theme.colorScheme.primary,
-                    child: Text(
-                      _getInitials(conversation.otherUser.username),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  leading: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      CircleAvatar(
+                        radius: 26,
+                        backgroundColor: hasUnread
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.primary.withValues(alpha: 0.85),
+                        child: Text(
+                          _getInitials(conversation.otherUser.username),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
                       ),
-                    ),
+                      if (hasUnread)
+                        Positioned(
+                          right: -2,
+                          top: -2,
+                          child: Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   title: Text(
                     conversation.otherUser.username,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontWeight: hasUnread ? FontWeight.w800 : FontWeight.bold,
                       fontSize: 16,
+                      color: hasUnread ? Colors.black : Colors.black87,
                     ),
                   ),
                   subtitle: Padding(
@@ -179,20 +219,56 @@ class ChatsScreenState extends State<ChatsScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: hasUnread
+                            ? Colors.black87
+                            : Colors.grey.shade600,
                         fontSize: 14,
+                        fontWeight:
+                            hasUnread ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                   ),
-                  trailing: timeLabel.isNotEmpty
-                      ? Text(
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (timeLabel.isNotEmpty)
+                        Text(
                           timeLabel,
                           style: TextStyle(
-                            color: Colors.grey.shade500,
+                            color: hasUnread
+                                ? theme.colorScheme.primary
+                                : Colors.grey.shade500,
                             fontSize: 12,
+                            fontWeight:
+                                hasUnread ? FontWeight.w700 : FontWeight.normal,
                           ),
-                        )
-                      : null,
+                        ),
+                      if (hasUnread) ...[
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            conversation.unreadCount > 99
+                                ? '99+'
+                                : '${conversation.unreadCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -204,6 +280,7 @@ class ChatsScreenState extends State<ChatsScreen> {
                       ),
                     ).then((_) => _loadConversations());
                   },
+                ),
                 );
               },
             ),

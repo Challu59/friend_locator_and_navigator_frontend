@@ -340,6 +340,9 @@ class _ChatScreenState extends State<ChatScreen> {
           }
         });
 
+        if (message.sender != currentUserId) {
+          chatService.markRoomAsRead(widget.roomId);
+        }
 
         Future.delayed(const Duration(milliseconds: 50), () => _scrollToBottom());
       },
@@ -363,6 +366,7 @@ class _ChatScreenState extends State<ChatScreen> {
         messages = fetchedMessages;
         isLoading = false;
       });
+      await chatService.markRoomAsRead(widget.roomId);
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     } catch (e) {
       setState(() => isLoading = false);

@@ -53,6 +53,17 @@ class ChatService {
     throw Exception("Failed to fetch conversations");
   }
 
+  Future<void> markRoomAsRead(int roomId) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/rooms/$roomId/read/"),
+      headers: await _getHeaders(),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to mark room as read");
+    }
+  }
+
   // future to fetch messages from the backend
   Future<List<MessageModel>> fetchMessages(int roomId) async{
     final response = await http.get(
