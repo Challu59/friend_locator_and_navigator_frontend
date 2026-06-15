@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../friends/screens/requests_screen.dart';
 import '../../friends/screens/search_screen.dart';
 import '../../friends/services/friend_service.dart';
+import '../../location/screens/map_screen.dart';
 import 'chats_screen.dart';
 import 'profile_screen.dart';
 
@@ -20,6 +21,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
   final GlobalKey<ChatsScreenState> _chatsKey = GlobalKey();
   final GlobalKey<SearchScreenState> _searchKey = GlobalKey();
   final GlobalKey<RequestsScreenState> _requestsKey = GlobalKey();
+  final GlobalKey<MapScreenState> _mapKey = GlobalKey();
 
   final FriendService _friendService = FriendService();
 
@@ -36,6 +38,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
       onRequestsChanged: _loadPendingCount,
     ),
     SearchScreen(key: _searchKey),
+    MapScreen(key: _mapKey),
     const ProfileScreen(),
   ];
 
@@ -63,6 +66,8 @@ class _MainShellScreenState extends State<MainShellScreen> {
     } else if (index == 1) {
       _requestsKey.currentState?.refresh();
       _loadPendingCount();
+    } else if (index == 3) {
+      _mapKey.currentState?.refresh();
     }
   }
 
@@ -133,6 +138,11 @@ class _MainShellScreenState extends State<MainShellScreen> {
               icon: Icon(Icons.search, size: 24),
               selectedIcon: Icon(Icons.search, size: 24),
               label: 'Search',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.map_outlined, size: 24),
+              selectedIcon: Icon(Icons.map, size: 24),
+              label: 'Map',
             ),
             const NavigationDestination(
               icon: Icon(Icons.person_outline, size: 24),
